@@ -6,6 +6,8 @@ dealBtn = document.querySelector(`.deal-Btn`)
 hitBtn = document.querySelector(`.hit-Btn`)
 standBtn = document.querySelector(`.stand-Btn`)
 newGameBtn = document.querySelector(`.newGame-Btn`)
+playerAceDisplayElem = document.querySelector(`.playerAceDisplay`)
+dealerAceDisplayElem = document.querySelector(`.dealerAceDisplay`)
 suppTextElem = document.querySelector(`.suppText`)
 
 /*----- constants -----*/
@@ -15,6 +17,8 @@ const suits = [`spades`, `clubs`, `hearts`, `diamonds`]
 /*----- state variables -----*/
 
 let deck = []
+let playerCardsArr = []
+let dealerCardsArr = []
 let playerBust = false
 
 /*----- event listeners -----*/
@@ -25,6 +29,18 @@ standBtn.addEventListener(`click`, handleStandClick)
 newGameBtn.addEventListener(`click`, handleNewGameClick)
 
 /*----- functions -----*/
+
+function dealPlayerCard () {
+    playerCardsArr.push(deck[randomCardIndex()].cardValue)
+    playerTotalElem.textContent = sumOfArray(playerCardsArr)
+}
+
+
+function dealDealerCard () {
+    dealerCardsArr.push(deck[randomCardIndex()].cardValue)
+    dealerTotalElem.textContent = sumOfArray(dealerCardsArr)
+}
+
 
 function handleDealClick () {
     // deactivate button until new game
@@ -42,15 +58,24 @@ function handleDealClick () {
             card.cardValue = 10
         }
     }
+
     // deal player and dealer cards
-    playerTotalElem.textContent = deck[randomCardIndex()].cardValue
-    dealerTotalElem.textContent = deck[randomCardIndex()].cardValue
-    playerTotalElem.textContent = Number(playerTotalElem.textContent) + deck[randomCardIndex()].cardValue
+    dealPlayerCard()
+    dealDealerCard()
+    dealPlayerCard()
+
+    // check for ace
+    playerCheckAce()
+    dealerCheckAce()
+
+    console.log(playerCardsArr)
 }
 
 
 function handleHitClick () {
-    playerTotalElem.textContent = Number(playerTotalElem.textContent) + deck[randomCardIndex()].cardValue
+    // deal player card and check for ace
+    dealPlayerCard()
+    playerCheckAce()
 
     // player bust condition
     if (Number(playerTotalElem.textContent) > 21) {
@@ -70,8 +95,18 @@ function handleHitClick () {
 
 
 function handleStandClick () {
+    // fix ace display
+    if (playerCardsArr.includes(1)) {
+        if (Number(playerTotalElem.textContent) + 10 <= 21) {
+            playerTotalElem.textContent = Number(playerTotalElem.textContent) + 10
+            playerAceDisplayElem.textContent = ``
+        }
+    }
+
+    // deal dealer cards until 17 or more
     while (Number(dealerTotalElem.textContent) < 18) {
-        dealerTotalElem.textContent = Number(dealerTotalElem.textContent) + deck[randomCardIndex()].cardValue
+        dealDealerCard()
+        dealerCheckAce()
         console.log(dealerTotalElem.textContent)
     }
 }
@@ -85,6 +120,8 @@ function handleNewGameClick () {
     hitBtn.disabled = false
     standBtn.disabled = false
     deck = []
+    playerCardsArr = []
+    dealerCardsArr = []
 }
 
 
@@ -100,4 +137,37 @@ function randomCardIndex () {
     deck[randomIndex].dealt = true
 
     return randomIndex
+}
+
+
+function playerCheckAce () {
+       // check for player ace
+    if (playerCardsArr.includes(1)) {
+        if (Number(playerTotalElem.textContent) + 11 <= 21) {
+            playerAceDisplayElem.textContent = ` / ${Number(playerTotalElem.textContent) + 10}`
+        } else {
+            playerAceDisplayElem.textContent = ``
+        }
+    }
+}
+
+
+function dealerCheckAce () {
+    // check for dealer ace
+    if (dealerCardsArr.includes(1)) {
+        if (Number(dealerTotalElem.textContent) + 11 <= 21) {
+            dealerAceDisplayElem.textContent = ` / ${Number(dealerTotalElem.textContent) + 10}`
+        } else {
+            dealerAceDisplayElem.textContent = ``
+        }
+    }
+}
+
+
+function sumOfArray (array) {
+    let totalNum = 0;
+    for (let num of array) {
+        totalNum += num
+    }
+    return totalNum
 }
