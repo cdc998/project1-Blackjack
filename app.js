@@ -7,19 +7,28 @@ hitBtn = document.querySelector(`.hit-Btn`)
 standBtn = document.querySelector(`.stand-Btn`)
 doubleBtn = document.querySelector(`.double-Btn`)
 newGameBtn = document.querySelector(`.newGame-Btn`)
+playBtn = document.querySelector(`.play-Btn`)
 playerAceDisplayElem = document.querySelector(`.playerAceDisplay`)
 dealerAceDisplayElem = document.querySelector(`.dealerAceDisplay`)
 suppTextElem = document.querySelector(`.suppText`)
 
+
+
 /*----- constants -----*/
 
 const suits = [`spades`, `clubs`, `hearts`, `diamonds`]
+
+
 
 /*----- state variables -----*/
 
 let deck = []
 let playerCardsArr = []
 let dealerCardsArr = []
+let playerBlackjack = false
+let dealerBlackjack = false
+
+
 
 /*----- event listeners -----*/
 
@@ -27,6 +36,9 @@ dealBtn.addEventListener(`click`, handleDealClick)
 hitBtn.addEventListener(`click`, handleHitClick)
 standBtn.addEventListener(`click`, handleStandClick)
 newGameBtn.addEventListener(`click`, handleNewGameClick)
+playBtn.addEventListener(`click`, handlePlayClick)
+
+
 
 /*----- functions -----*/
 
@@ -52,6 +64,7 @@ function handleDealClick () {
             deck.push({cardNum: cardNum, cardValue: cardNum, cardSuit: suit, dealt: false})
         }
     }
+
     // JQK becomes value of 10
     for (let card of deck) {
         if (card.cardValue > 10) {
@@ -68,6 +81,7 @@ function handleDealClick () {
     if (playerCardsArr.includes(1)) {
         if (sumOfArray(playerCardsArr) === 11) {
             playerTotalElem.textContent = `21 (Blackjack!)`
+            playerBlackjack = true
             hitBtn.disabled = true
             standBtn.disabled = true
             handleStandClick()
@@ -114,11 +128,42 @@ function handleStandClick () {
         }
     }
 
+    // check dealer blackjack
+    dealDealerCard()
+    if (dealerCardsArr.includes(1)) {
+        if (sumOfArray(dealerCardsArr) === 11) {
+            dealerTotalElem.textContent = `21 (Blackjack!)`
+            dealerAceDisplayElem.textContent = ``
+            dealerBlackjack = true
+        }
+    }
+    
     // deal dealer cards until 17 or more
-    while (Number(dealerTotalElem.textContent) < 18) {
-        dealDealerCard()
-        dealerCheckAce()
-        console.log(dealerTotalElem.textContent)
+    if (dealerBlackjack === false && playerBlackjack === false) {
+        while (Number(dealerTotalElem.textContent) < 18) {
+            dealDealerCard()
+            let dealerStandNums = [7, 8, 9, 10, 11]
+            if (dealerCardsArr.includes(1)) {
+                if (dealerStandNums.includes(sumOfArray(dealerCardsArr))) {
+                    dealerTotalElem.textContent = Number(dealerTotalElem.textContent) + 10
+                    dealerAceDisplayElem.textContent = ``
+                    break;
+                }
+            }
+            dealerCheckAce()
+        }
+    }
+
+    // check blackjacks (avoid tying when blackjack vs 21)
+    if (playerBlackjack && dealerBlackjack) {
+        suppTextElem.textContent = `Tie!`
+        return
+    } else if (playerBlackjack) {
+        suppTextElem.textContent = `You Win!`
+        return
+    } else if (dealerBlackjack) {
+        suppTextElem.textContent = `You Lose!`
+        return
     }
 
     // check win, tie or loss condition
@@ -138,12 +183,26 @@ function handleNewGameClick () {
     dealerTotalElem.textContent = ``
     playerAceDisplayElem.textContent = ``
     dealerAceDisplayElem.textContent = ``
+    suppTextElem.textContent = `Good Luck!`
+    playerBlackjack = false
+    dealerBlackjack = false
     dealBtn.disabled = false
     hitBtn.disabled = false
     standBtn.disabled = false
     deck = []
     playerCardsArr = []
     dealerCardsArr = []
+}
+
+
+function handlePlayClick () {
+    document.querySelector(`.card1Inner`).classList.add(`puff-out-center`)
+    document.querySelector(`.card2Inner`).classList.add(`puff-out-center`)
+    document.querySelector(`.card2Inner`).style.animationDelay = `0.3s`
+    document.querySelector(`.titleText`).classList.add(`puff-out-center`)
+    document.querySelector(`.titleText`).style.animationDelay = `0.6s`
+    playBtn.classList.add(`fade-out`)
+    playBtn.style.animationDelay = `0.9s`
 }
 
 
