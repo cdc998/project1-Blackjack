@@ -5,6 +5,7 @@ dealerTotalElem = document.querySelector(`.dealerCards`)
 dealBtn = document.querySelector(`.deal-Btn`)
 hitBtn = document.querySelector(`.hit-Btn`)
 standBtn = document.querySelector(`.stand-Btn`)
+doubleBtn = document.querySelector(`.double-Btn`)
 newGameBtn = document.querySelector(`.newGame-Btn`)
 playerAceDisplayElem = document.querySelector(`.playerAceDisplay`)
 dealerAceDisplayElem = document.querySelector(`.dealerAceDisplay`)
@@ -19,7 +20,6 @@ const suits = [`spades`, `clubs`, `hearts`, `diamonds`]
 let deck = []
 let playerCardsArr = []
 let dealerCardsArr = []
-let playerBust = false
 
 /*----- event listeners -----*/
 
@@ -64,9 +64,21 @@ function handleDealClick () {
     dealDealerCard()
     dealPlayerCard()
 
+    // check for player blackjack
+    if (playerCardsArr.includes(1)) {
+        if (sumOfArray(playerCardsArr) === 11) {
+            playerTotalElem.textContent = `21 (Blackjack!)`
+            hitBtn.disabled = true
+            standBtn.disabled = true
+            handleStandClick()
+            return
+        }
+    }
+
     // check for ace
     playerCheckAce()
     dealerCheckAce()
+
 
     console.log(playerCardsArr)
 }
@@ -79,7 +91,6 @@ function handleHitClick () {
 
     // player bust condition
     if (Number(playerTotalElem.textContent) > 21) {
-        playerBust = true
         hitBtn.disabled = true
         standBtn.disabled = true
         suppTextElem.textContent = `You busted!`
@@ -109,6 +120,15 @@ function handleStandClick () {
         dealerCheckAce()
         console.log(dealerTotalElem.textContent)
     }
+
+    // check win, tie or loss condition
+    if (Number(playerTotalElem.textContent) > Number(dealerTotalElem.textContent) || Number(dealerTotalElem.textContent) > 21) {
+        suppTextElem.textContent = `You Win!`
+    } else if (Number(playerTotalElem.textContent) === Number(dealerTotalElem.textContent)) {
+        suppTextElem.textContent = `Tie!`
+    } else {
+        suppTextElem.textContent = `You Lose!`
+    }
 }
 
 
@@ -116,6 +136,8 @@ function handleNewGameClick () {
     playerBust = false
     playerTotalElem.textContent = ``
     dealerTotalElem.textContent = ``
+    playerAceDisplayElem.textContent = ``
+    dealerAceDisplayElem.textContent = ``
     dealBtn.disabled = false
     hitBtn.disabled = false
     standBtn.disabled = false
