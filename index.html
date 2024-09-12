@@ -58,10 +58,8 @@
         <img class="dealerCard5" src="">
     </div>
 
-    <div class="dealerCards"></div>
-    <div class="playerCards"></div>
-
-    <!-- <input type="number"> -->
+    <div class="dealerCards text-shadow-pop-tr"></div>
+    <div class="playerCards text-shadow-pop-tr"></div>
 
     <button class="play-Btn">PLAY</button>
 
@@ -79,9 +77,15 @@
         <button class="double-Btn">DOUBLE</button>
     </div>
 
-    <button class="deal-Btn">DEAL</button>
-
+    <button class="deal-Btn" disabled>DEAL</button>
     <button class="newGame-Btn">NEW GAME</button>
+
+    <audio id="chips" src="./sounds/chips.mp3" preload="auto"></audio>
+    <audio id="register" src="./sounds/register.mp3" preload="auto"></audio>
+    <audio id="jazz" src="./sounds/jazz.mp3" loop preload="auto"></audio>
+    <audio id="cardFlip" src="./sounds/cardFlip.mp3"></audio>
+    <audio id="cardRiffle" src="./sounds/cardRiffle.mp3"></audio>
+    <audio id="loss" src="./sounds/Loss.mp3"></audio>
 
     <script src="app.js"></script>
 </body>

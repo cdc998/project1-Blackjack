@@ -30,7 +30,14 @@ dealerCard5 = document.querySelector(`.dealerCard5`)
 dealerCardImgs = document.querySelectorAll(`.dealerCardImgs img`)
 betBtnAll = document.querySelectorAll(`.betting-Btns button`)
 playBtnAll = document.querySelectorAll(`.playing-Btns button`)
-
+chipsContainer = document.querySelector(`.chipsContainer`)
+bettingContainer = document.querySelector(`.bettingContainer`)
+chipsSound = document.querySelector(`#chips`)
+registerSound = document.querySelector(`#register`)
+jazzSound = document.querySelector(`#jazz`)
+cardFlipSound = document.querySelector(`#cardFlip`)
+cardRiffleSound = document.querySelector(`#cardRiffle`)
+lossSound = document.querySelector(`#loss`)
 
 
 /*----- constants -----*/
@@ -56,6 +63,7 @@ let betBtnAnimationStyle = true
 let dealBtnActive = false
 let playingBtnsActive = false
 let newGameBtnActive = false
+let bankrupt = false
 
 
 
@@ -65,6 +73,7 @@ dealBtn.addEventListener(`click`, handleDealClick)
 hitBtn.addEventListener(`click`, handleHitClick)
 standBtn.addEventListener(`click`, handleStandClick)
 newGameBtn.addEventListener(`click`, handleNewGameClick)
+doubleBtn.addEventListener(`click`, handleDoubleClick)
 playBtn.addEventListener(`click`, handlePlayClick)
 bet1Btn.addEventListener(`click`, handleBet1Click)
 bet5Btn.addEventListener(`click`, handleBet5Click)
@@ -79,6 +88,8 @@ bet500Btn.addEventListener(`click`, handleBet500Click)
 function dealPlayerCard () {
     playerCardsArr.push(deck[randomCardIndex()].cardValue)
     playerTotalElem.textContent = sumOfArray(playerCardsArr)
+    playerCheckAce()
+    cardFlipSound.play()
     
     if (playerCardCounter === 0) {
         playerCard1.src = `images/cards/${randomIndexNum}.svg`
@@ -106,6 +117,8 @@ function dealPlayerCard () {
 function dealDealerCard () {
     dealerCardsArr.push(deck[randomCardIndex()].cardValue)
     dealerTotalElem.textContent = sumOfArray(dealerCardsArr)
+    dealerCheckAce()
+    cardFlipSound.play()
 
     if (dealerCardCounter === 0) {
         dealerCard1.src = `images/cards/${randomIndexNum}.svg`
@@ -164,24 +177,19 @@ function handleDealClick () {
     // check for player blackjack
     if (playerCardsArr.includes(1)) {
         if (sumOfArray(playerCardsArr) === 11) {
+            titleTextElem.textContent = `You Win!`
             playerTotalElem.textContent = `21 (Blackjack!) Paying 2 to 1`
             playerBlackjack = true
             renderPlayerBlackjack()
             handleStandClick()
         }
     }
-
-    // check for ace
-    playerCheckAce()
-    dealerCheckAce()
 }
 
 
 function handleHitClick () {
     // deal player card and check for ace
     dealPlayerCard()
-    playerCheckAce()
-
 
     // player bust condition
     if (Number(playerTotalElem.textContent) > 21) {
@@ -194,6 +202,7 @@ function handleHitClick () {
             playingBtn.disabled = true
         }
         toggleNewGameBtn()
+        checkBankruptcy()
     }
 
 
@@ -253,7 +262,6 @@ function handleStandClick () {
             }
         }
         dealDealerCard()
-        dealerCheckAce()
     }
     
 
@@ -292,12 +300,39 @@ function handleStandClick () {
         renderPlayerLose()
     }
 
-
     toggleNewGameBtn()
+    checkBankruptcy()
+}
+
+
+function handleDoubleClick () {
+    if (chipsTotalNum < betTotalNum) {
+        renderChipBetBalance()
+        return
+    }
+
+    playerCardsArr.push(deck[randomCardIndex()].cardValue)
+    playerTotalElem.textContent = sumOfArray(playerCardsArr)
+    playerCard3.src = `images/cards/${randomIndexNum}.svg`
+    playerCard3.classList.add(`doubleCard`)
+    chipsTotalNum -= betTotalNum
+    betTotalNum = betTotalNum * 2
+    
+    cardFlipSound.play()
+    playerCheckAce()
+    renderChipBetBalance()
+    handleStandClick()
 }
 
 
 function handleNewGameClick () {
+    if (bankrupt) {
+        chipsTotal.textContent = 200
+        chipsTotalNum = 200
+        bankrupt = false
+        newGameBtn.textContent = `NEW GAME`
+    }
+
     playerTotalElem.textContent = ``
     dealerTotalElem.textContent = ``
     titleTextElem.textContent = `Place Your Bets`
@@ -308,9 +343,13 @@ function handleNewGameClick () {
     toggleBetBtns()
     toggleDealBtn()
     resetCardAnimations()
+    cardRiffleSound.play()
     deck = []
     playerCardsArr = []
     dealerCardsArr = []
+
+    chipsTotal.classList.remove(`flashGreenBack`)
+    chipsTotal.classList.remove(`flashRedBack`)
 
     for (let cardImg of playerCardImgs) {
         cardImg.src = ``
@@ -321,10 +360,15 @@ function handleNewGameClick () {
         dealercardImg.src = ``
     }
     dealerCardCounter = 0
+
+    // ensure there is bet before dealing
+    dealBtn.disabled = true
 }
 
 
 function handlePlayClick () {
+    jazzSound.play()
+
     // fade out splash screen elements
     playBtn.disabled = true
     document.querySelector(`.card1Inner`).classList.add(`puff-out-center`)
@@ -348,6 +392,10 @@ function handlePlayClick () {
     bet100Btn.style.animationDelay = `3.6s`
     bet500Btn.classList.add(`slide-in-blurred-bottom`)
     bet500Btn.style.animationDelay = `3.8s`
+    chipsContainer.classList.add(`scale-in-center`)
+    chipsContainer.style.animationDelay = `4.2s`
+    bettingContainer.classList.add(`scale-in-center`)
+    bettingContainer.style.animationDelay = `4.2s`
 
     dealBtn.classList.remove(`displayNone`)
     dealBtn.classList.add(`scale-in-center`)
@@ -385,9 +433,9 @@ function handleBet100Click () {
 }
 function handleBet500Click () {
     if (checkChipsBalance(500)){
-    chipsTotalNum -= 500
-    betTotalNum += 500
-    renderChipBetBalance()
+        chipsTotalNum -= 500
+        betTotalNum += 500
+        renderChipBetBalance()
     }
 }
 
@@ -455,6 +503,9 @@ function checkChipsBalance (num) {
 function renderChipBetBalance () {
     chipsTotal.textContent = chipsTotalNum
     betTotal.textContent = betTotalNum
+    flashRedBackChips()
+    dealBtn.disabled = false
+    chipsSound.play();
 }
 
 
@@ -463,14 +514,17 @@ function renderPlayerWin () {
     chipsTotalNum = chipsTotalNum + (betTotalNum * 2)
     betTotalNum = 0
     betTotal.textContent = 0
+    flashGreenBackChips()
+    registerSound.play()
 }
 
 
 function renderPlayerBlackjack () {
     chipsTotal.textContent = Number(chipsTotal.textContent) + (betTotalNum * 2.5)
-    chipsTotalNum = chipsTotalNum + (betTotalNum * 2.5)
+    chipsTotalNum = chipsTotalNum + Math.ceil((betTotalNum * 2.5))
     betTotalNum = 0
     betTotal.textContent = 0
+    flashGreenBackChips()
 }
 
 
@@ -479,12 +533,15 @@ function renderPlayerTie () {
     chipsTotalNum += betTotalNum
     betTotalNum = 0
     betTotal.textContent = 0
+    flashGreenBackChips()
 }
 
 
 function renderPlayerLose () {
     betTotal.textContent = 0
     betTotalNum = 0
+    flashRedBackBet()
+    lossSound.play()
 }
 
 
@@ -585,13 +642,43 @@ function toggleNewGameBtn () {
 }
 
 
-function resetCardAnimations() {
+function resetCardAnimations () {
     for (playerCardImg of playerCardImgs) {
-        playerCardImg.classList.remove(`card1Flip`, `card2Flip`, `card3Flip`, `card4Flip`, `card5Flip`)
+        playerCardImg.classList.remove(`card1Flip`, `card2Flip`, `card3Flip`, `card4Flip`, `card5Flip`, `doubleCard`)
         playerCardImg.style.animationDelay = ``
     }
     for (dealerCardImg of dealerCardImgs) {
         dealerCardImg.classList.remove(`dealerCard1Flip`, `dealerCard2Flip`, `dealerCard3Flip`, `dealerCard4Flip`, `dealerCard5Flip`, `dealerCard1Shift`)
         dealerCardImg.style.animationDelay = ``
+    }
+}
+
+
+function flashRedBackChips () {
+    chipsTotal.classList.remove(`flashRedBack`)
+    void chipsTotal.offsetWidth
+    chipsTotal.classList.add(`flashRedBack`)
+}
+
+
+function flashRedBackBet () {
+    betTotal.classList.remove(`flashRedBack`)
+    void betTotal.offsetWidth
+    betTotal.classList.add(`flashRedBack`)
+}
+
+
+function flashGreenBackChips () {
+    chipsTotal.classList.remove(`flashGreenBack`)
+    void chipsTotal.offsetWidth
+    chipsTotal.classList.add(`flashGreenBack`)
+}
+
+
+function checkBankruptcy () {
+    if (Number(chipsTotal.textContent) === 0) {
+        newGameBtn.textContent = `RESTART`
+        bankrupt = true
+        titleTextElem.textContent = `Bankruptcy, House Wins`
     }
 }
