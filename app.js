@@ -253,17 +253,18 @@ function handleStandClick () {
     
     
     // deal dealer cards until 17 or more
-    while (sumOfArray(dealerCardsArr) < 17) {
-        let dealerStandNums = [7, 8, 9, 10, 11]
-        if (dealerCardsArr.includes(1)) {
-            if (dealerStandNums.includes(sumOfArray(dealerCardsArr))) {
-                dealerTotalElem.textContent = sumOfArray(dealerCardsArr) + 10
-                break;
+    if (dealerBlackjack === false) {
+        while (sumOfArray(dealerCardsArr) < 17) {
+            let dealerStandNums = [7, 8, 9, 10, 11]
+            if (dealerCardsArr.includes(1)) {
+                if (dealerStandNums.includes(sumOfArray(dealerCardsArr))) {
+                    dealerTotalElem.textContent = sumOfArray(dealerCardsArr) + 10
+                    break;
+                }
             }
+            dealDealerCard()
         }
-        dealDealerCard()
     }
-    
 
 
     // check for dealer bust
@@ -520,8 +521,8 @@ function renderPlayerWin () {
 
 
 function renderPlayerBlackjack () {
-    chipsTotal.textContent = Number(chipsTotal.textContent) + (betTotalNum * 2.5)
-    chipsTotalNum = chipsTotalNum + Math.ceil((betTotalNum * 2.5))
+    chipsTotal.textContent = Number(chipsTotal.textContent) + Math.ceil(betTotalNum * 2.5)
+    chipsTotalNum = chipsTotalNum + Math.ceil(betTotalNum * 2.5)
     betTotalNum = 0
     betTotal.textContent = 0
     flashGreenBackChips()
@@ -534,6 +535,7 @@ function renderPlayerTie () {
     betTotalNum = 0
     betTotal.textContent = 0
     flashGreenBackChips()
+    registerSound.play()
 }
 
 
