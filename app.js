@@ -13,6 +13,7 @@ bet5Btn = document.querySelector(`.bet5-Btn`)
 bet25Btn = document.querySelector(`.bet25-Btn`)
 bet100Btn = document.querySelector(`.bet100-Btn`)
 bet500Btn = document.querySelector(`.bet500-Btn`)
+betBtns = document.querySelectorAll(`betting-Btns`)
 titleTextElem = document.querySelector(`.titleText`)
 chipsTotal = document.querySelector(`.chipsTotal`)
 betTotal = document.querySelector(`.betTotal`)
@@ -75,11 +76,9 @@ standBtn.addEventListener(`click`, handleStandClick)
 newGameBtn.addEventListener(`click`, handleNewGameClick)
 doubleBtn.addEventListener(`click`, handleDoubleClick)
 playBtn.addEventListener(`click`, handlePlayClick)
-bet1Btn.addEventListener(`click`, handleBet1Click)
-bet5Btn.addEventListener(`click`, handleBet5Click)
-bet25Btn.addEventListener(`click`, handleBet25Click)
-bet100Btn.addEventListener(`click`, handleBet100Click)
-bet500Btn.addEventListener(`click`, handleBet500Click)
+for (let singleBetBtn of betBtnAll) {
+    singleBetBtn.addEventListener(`click`, handleBetClick)
+}
 
 
 
@@ -102,12 +101,15 @@ function dealPlayerCard () {
     } else if (playerCardCounter === 2) {
         playerCard3.src = `images/cards/${randomIndexNum}.svg`
         playerCard3.classList.add(`card3Flip`)
+        playerCard3.style.animationDelay = `0.1s`
     } else if (playerCardCounter === 3) {
         playerCard4.src = `images/cards/${randomIndexNum}.svg`
         playerCard4.classList.add(`card4Flip`)
+        playerCard4.style.animationDelay = `0.1s`
     } else if (playerCardCounter === 4) {
         playerCard5.src = `images/cards/${randomIndexNum}.svg`
         playerCard5.classList.add(`card5Flip`)
+        playerCard5.style.animationDelay = `0.1s`
     }
 
     playerCardCounter++
@@ -177,10 +179,8 @@ function handleDealClick () {
     // check for player blackjack
     if (playerCardsArr.includes(1)) {
         if (sumOfArray(playerCardsArr) === 11) {
-            titleTextElem.textContent = `You Win!`
             playerTotalElem.textContent = `21 (Blackjack!) Paying 2 to 1`
             playerBlackjack = true
-            renderPlayerBlackjack()
             handleStandClick()
         }
     }
@@ -191,20 +191,9 @@ function handleHitClick () {
     // deal player card and check for ace
     dealPlayerCard()
 
-    // player bust condition
     if (Number(playerTotalElem.textContent) > 21) {
-        hitBtn.disabled = true
-        standBtn.disabled = true
-        renderPlayerLose()
-        titleTextElem.textContent = `You Lose!`
-        playerTotalElem.textContent = `BUST`
-        for (let playingBtn of playBtnAll) {
-            playingBtn.disabled = true
-        }
-        toggleNewGameBtn()
-        checkBankruptcy()
+        handleStandClick()
     }
-
 
     // player 21 condition
     if (Number(playerTotalElem.textContent) === 21) {
@@ -224,7 +213,6 @@ function handleStandClick () {
         playingBtn.disabled = true
     }
 
-
     // fix ace display
     if (playerCardsArr.includes(1) && playerBlackjack === false) {
         if (sumOfArray(playerCardsArr) < 10) {
@@ -236,11 +224,19 @@ function handleStandClick () {
         }
     }
 
+    // player bust condition
+    if (Number(playerTotalElem.textContent) > 21) {
+        titleTextElem.textContent = `You Lose!`
+        playerTotalElem.textContent = `BUST`
+        renderPlayerLose()
+        toggleNewGameBtn()
+        checkBankruptcy()
+        return
+    }
 
     // shift dealer Cards
     dealerCard1.style.animationDelay = `0s`
     dealerCard1.classList.add(`dealerCard1Shift`)
-  
 
     // check dealer blackjack
     dealDealerCard()
@@ -251,21 +247,37 @@ function handleStandClick () {
         }
     }
     
-    
-    // deal dealer cards until 17 or more
-    if (dealerBlackjack === false) {
-        while (sumOfArray(dealerCardsArr) < 17) {
-            let dealerStandNums = [7, 8, 9, 10, 11]
-            if (dealerCardsArr.includes(1)) {
-                if (dealerStandNums.includes(sumOfArray(dealerCardsArr))) {
-                    dealerTotalElem.textContent = sumOfArray(dealerCardsArr) + 10
-                    break;
-                }
-            }
-            dealDealerCard()
-        }
+    // check blackjacks (avoid tying when blackjack vs 21)
+    if (playerBlackjack && dealerBlackjack) {
+        titleTextElem.textContent = `Tie!`
+        playerTotalElem.textContent = `21 (Blackjack)`
+        renderPlayerTie()
+        toggleNewGameBtn()
+        return
+    } else if (dealerBlackjack) {
+        titleTextElem.textContent = `You Lose!`
+        renderPlayerLose()
+        toggleNewGameBtn()
+        checkBankruptcy()
+        return
+    } else if (playerBlackjack) {
+        titleTextElem.textContent = `You Win!`
+        renderPlayerBlackjack()
+        toggleNewGameBtn()
+        return
     }
 
+    // deal dealer cards until 17 or more
+    while (sumOfArray(dealerCardsArr) < 17) {
+        let dealerStandNums = [7, 8, 9, 10, 11]
+        if (dealerCardsArr.includes(1)) {
+            if (dealerStandNums.includes(sumOfArray(dealerCardsArr))) {
+                    dealerTotalElem.textContent = sumOfArray(dealerCardsArr) + 10
+                    break;
+            }
+        }
+        dealDealerCard()
+    }
 
     // check for dealer bust
     if (Number(dealerTotalElem.textContent) > 21) {
@@ -276,27 +288,14 @@ function handleStandClick () {
         return
     }
 
-    
     // check win, tie or loss condition
-    if (dealerBlackjack === false && playerBlackjack === false) {
-        if (Number(playerTotalElem.textContent) > Number(dealerTotalElem.textContent)) {
-            titleTextElem.textContent = `You Win!`
-            renderPlayerWin()
-        } else if (Number(playerTotalElem.textContent) === Number(dealerTotalElem.textContent)) {
-            titleTextElem.textContent = `Tie!`
-            renderPlayerTie()
-        } else {
-            titleTextElem.textContent = `You Lose!`
-            renderPlayerLose()
-        }
-    }
-
-
-    // check blackjacks (avoid tying when blackjack vs 21)
-    if (playerBlackjack && dealerBlackjack) {
+    if (Number(playerTotalElem.textContent) > Number(dealerTotalElem.textContent)) {
+        titleTextElem.textContent = `You Win!`
+        renderPlayerWin()
+    } else if (Number(playerTotalElem.textContent) === Number(dealerTotalElem.textContent)) {
         titleTextElem.textContent = `Tie!`
         renderPlayerTie()
-    } else if (dealerBlackjack) {
+    } else {
         titleTextElem.textContent = `You Lose!`
         renderPlayerLose()
     }
@@ -320,7 +319,6 @@ function handleDoubleClick () {
     betTotalNum = betTotalNum * 2
     
     cardFlipSound.play()
-    playerCheckAce()
     renderChipBetBalance()
     handleStandClick()
 }
@@ -404,38 +402,12 @@ function handlePlayClick () {
 }
 
 
-function handleBet1Click () {
-    if (checkChipsBalance(1)){
-        chipsTotalNum -= 1
-        betTotalNum += 1
-        renderChipBetBalance()
-    }
-}
-function handleBet5Click () {
-    if (checkChipsBalance(5)){
-        chipsTotalNum -= 5
-        betTotalNum +=5
-        renderChipBetBalance()
-    }
-}
-function handleBet25Click () {
-    if (checkChipsBalance(25)){
-        chipsTotalNum -= 25
-        betTotalNum += 25
-        renderChipBetBalance()
-    }
-}
-function handleBet100Click () {
-    if (checkChipsBalance(100)){
-        chipsTotalNum -= 100
-        betTotalNum += 100
-        renderChipBetBalance()
-    }
-}
-function handleBet500Click () {
-    if (checkChipsBalance(500)){
-        chipsTotalNum -= 500
-        betTotalNum += 500
+function handleBetClick (event) {
+    let elem = event.target
+    betAmount = Number(elem.dataset.bet)
+    if (checkChipsBalance(betAmount)) {
+        chipsTotalNum -= betAmount
+        betTotalNum += betAmount
         renderChipBetBalance()
     }
 }
@@ -460,7 +432,7 @@ function randomCardIndex () {
 
 
 function playerCheckAce () {
-       // check for player ace
+    // check for player ace
     if (playerCardsArr.includes(1) && playerBlackjack === false) {
         if (sumOfArray(playerCardsArr) + 10 <= 21) {
             playerTotalElem.textContent = playerTotalElem.textContent + ` / ${Number(playerTotalElem.textContent) + 10}`
@@ -526,6 +498,7 @@ function renderPlayerBlackjack () {
     betTotalNum = 0
     betTotal.textContent = 0
     flashGreenBackChips()
+    registerSound.play()
 }
 
 
@@ -684,3 +657,13 @@ function checkBankruptcy () {
         titleTextElem.textContent = `Bankruptcy, House Wins`
     }
 }
+
+
+function preloadImg () {
+    for (let i = 0; i < 52; i++) {
+        allCardImg = new Image();
+        allCardImg.src = `./images/cards/${i}.svg`
+    }
+}
+
+preloadImg()

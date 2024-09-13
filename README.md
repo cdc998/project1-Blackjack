@@ -16,9 +16,10 @@ In-game screenshots :framed_picture:
 ![Player Blackjack](./images/screenshots/screenshot7.png)
 
 ## Planning and Problem Solving :bookmark_tabs:
-- For my Blackjack game, I initially focused on the core logic, such as constructing a deck, randomly drawing cards, and establishing win/loss conditions. 	:pencil2:
-I tackled this by outlining the steps in plain English, then translating them into JavaScript syntax, ensuring that game logic and decision-making were modularized into functions for easier readability and future updates. 	:abacus:
-Once the minimal viable product was working, with basic user interactions in place, I concentrated on adding visual elements and animations. Handling specific challenges like the dual value of aces required special attention to ensure smooth gameplay. Throughout development, I continuously revisited the code to simplify and reduce redundancy, keeping the DRY principle in mind. :bulb:
+- For my Blackjack game, I initially focused on the core logic, such as constructing a deck, randomly drawing cards, and establishing win/loss conditions. :pencil2:
+- I tackled this by outlining the steps in plain English, then translating them into JavaScript syntax, ensuring that game logic and decision-making were modularized into functions for easier readability and future updates. :abacus:
+- Once the minimal viable product was working, with basic user interactions in place, I concentrated on adding visual elements and animations.
+- Handling specific challenges like the dual value of aces required special attention to ensure smooth gameplay. Throughout development, I continuously revisited the code to simplify and reduce redundancy, keeping the DRY principle in mind. :bulb:
 
 Flowcharts :chart_with_upwards_trend:
 ![Flowchart 1](./images/screenshots/flowchart1.png)
@@ -28,9 +29,8 @@ Flowcharts :chart_with_upwards_trend:
 
 - Whilst styling my game from MVP to the final product, I have learnt a considerable amount of how animation works using CSS keyframes, as well as CSS function hover, to create stunning effects when user hovers certain elements. :sparkler:
 - Being able to have access to a playing card library definitely helped the game look a lot more polished than it was.
-- Learning to add audio files depending on the game outcome was also very fun in progress. :smile:
-
-In-game animations :movie_camera:
+- Learning to add audio files depending on the game outcome was also very fun in progress. :smile:  
+In-game animations :movie_camera:  
 ![Splash Screen Intro](./images/screenshots/gif2.gif)
 ![Splash Screen Card Flipping](./images/screenshots/gif1.gif)
 ![Game Phase](./images/screenshots/gif3.gif)
