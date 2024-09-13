@@ -1,4 +1,4 @@
-# Classic Blackjack - project1
+# Semi-Classic Blackjack - project1
 Thank you for checking out my Blackjack project! :black_joker: I incorporated many new techniques I learnt into this game, try a hand and have fun! :sparkles:
 ## [Click here](https://cdc998.github.io/project1-Blackjack/) :computer_mouse: to see my live project!
 ## About :open_book:
@@ -14,6 +14,36 @@ In-game screenshots :framed_picture:
 ![Splash screen](./images/screenshots/screenshot1.png)
 ![Wagering screen](./images/screenshots/screenshot2.png)
 ![Player Blackjack](./images/screenshots/screenshot7.png)
+
+## How to Play :mortar_board:
+This blackjack game follows most of classic blackjack rules except that there is no insurance and split offered.
+### Game Rules
+- Objective: Players aim to get as close to 21 as possible without busting.
+- Card Values:
+    - Number cards: Face value
+    - Face cards (King, Queen, Jack): 10
+    - Aces: 1 or 11 depending which one benefits the hand more.
+- Dealer: Dealer must hit until they reach 17 or more. Dealer will stand on soft 17.
+- Player Decisions and Terminology
+    - Hit: Player requests an additional card.
+    - Stand: Player keeps their current hand.
+    - Double: Player doubles their wager, receives one additional card and stands unless player busts.
+    - Soft hand: A hand that contains an ace that is counted as 11.
+    - Bust: Hand's total number exceeds 21.
+    - Push: Tie.
+    - Blackjack: A hand consisting of an ace and a 10-value card.
+- Win Conditions:
+    - Player wins if their hand is closer to 21 than the dealer's hand without busting.
+    - Blackjack wins against any hand, unless the dealer also has a blackjack, resulting in a push.
+- Payouts:
+    - Blackjack pays 2.5x the wager, regular wins pay 2x.
+    - In the case of push, the original wager will be returned.
+    - If blackjack payouts results in number containing a decimal, the payout will be rounded up to the nearest integer.
+### Playing the game
+- Upon entering the game after clicking the play button, the player will be shown a screen in which they can place any amount of wager they'd like. Player's bankroll starts at 200, and will have a sizing choice of 1, 5, 25, 100 and 500. The game will not commence until player has at least wagered 1.  
+- Player will then be dealt 2 cards and dealer will have a face up card, and given three options of hitting, standing or doubling unless player has blackjack.
+- Dealer will hit until 17 or more (soft hands included.)
+- Hands will be checked against the win-loss conditions, and appropriate wager will be paid out or taken.
 
 ## Planning and Problem Solving :bookmark_tabs:
 - For my Blackjack game, I initially focused on the core logic, such as constructing a deck, randomly drawing cards, and establishing win/loss conditions. :pencil2:
@@ -46,4 +76,4 @@ In-game animations :movie_camera:
 ## Future Features :lantern:
 - I would definitely love to incorproate splitting as a decision that users can choose. The logic behind it was definitely achievable, but to incorporate visual elements on top of that was too challenging for this time. :flower_playing_cards:	:flower_playing_cards:	
 - There are also insurance that players can take when dealer's first card is an Ace, would be a fun challenge to add the logic of that into my code as well. :money_with_wings:
-- Allowing users to switch between different variations of blackjack is also exciting to think about. :mag_right:
+- Allowing users to switch between different variations of blackjack, or adding side bets such as Perfect Pairs is also exciting to think about. :mag_right:

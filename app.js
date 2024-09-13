@@ -33,6 +33,8 @@ betBtnAll = document.querySelectorAll(`.betting-Btns button`)
 playBtnAll = document.querySelectorAll(`.playing-Btns button`)
 chipsContainer = document.querySelector(`.chipsContainer`)
 bettingContainer = document.querySelector(`.bettingContainer`)
+muteImg = document.querySelector(`.mute`)
+unMuteImg = document.querySelector(`.unmute`)
 chipsSound = document.querySelector(`#chips`)
 registerSound = document.querySelector(`#register`)
 jazzSound = document.querySelector(`#jazz`)
@@ -65,6 +67,7 @@ let dealBtnActive = false
 let playingBtnsActive = false
 let newGameBtnActive = false
 let bankrupt = false
+let mute = false
 
 
 
@@ -79,6 +82,8 @@ playBtn.addEventListener(`click`, handlePlayClick)
 for (let singleBetBtn of betBtnAll) {
     singleBetBtn.addEventListener(`click`, handleBetClick)
 }
+muteImg.addEventListener(`click`, muteToggle)
+unMuteImg.addEventListener(`click`, muteToggle)
 
 
 
@@ -149,34 +154,28 @@ function dealDealerCard () {
 
 
 function handleDealClick () {
-    // deactivate button until new game
     toggleBetBtns()
     toggleDealBtn()
     togglePlayingBtns()
 
-    // change titleText to goodluck
     titleTextElem.textContent = `Good Luck!`
 
-    // construct deck
     for (let suit of suits) {
         for (cardNum = 1; cardNum <= 13; cardNum++) {
             deck.push({cardNum: cardNum, cardValue: cardNum, cardSuit: suit, dealt: false})
         }
     }
 
-    // JQK becomes value of 10
     for (let card of deck) {
         if (card.cardValue > 10) {
             card.cardValue = 10
         }
     }
 
-    // deal player and dealer cards
     dealPlayerCard()
     dealDealerCard()
     dealPlayerCard()
 
-    // check for player blackjack
     if (playerCardsArr.includes(1)) {
         if (sumOfArray(playerCardsArr) === 11) {
             playerTotalElem.textContent = `21 (Blackjack!) Paying 2 to 1`
@@ -188,17 +187,13 @@ function handleDealClick () {
 
 
 function handleHitClick () {
-    // deal player card and check for ace
     dealPlayerCard()
 
-    if (Number(playerTotalElem.textContent) > 21) {
+    if (Number(playerTotalElem.textContent) >= 21) {
         handleStandClick()
     }
 
-    // player 21 condition
-    if (Number(playerTotalElem.textContent) === 21) {
-        handleStandClick();
-    } else if (playerCardsArr.includes(1)) {
+    if (playerCardsArr.includes(1)) {
         if (Number(playerTotalElem.textContent.slice(0, 2)) + 10 === 21) {
             playerTotalElem.textContent = 21
             handleStandClick()
@@ -208,23 +203,18 @@ function handleHitClick () {
 
 
 function handleStandClick () {
-    // disable playing btns
     for (let playingBtn of playBtnAll) {
         playingBtn.disabled = true
     }
 
-    // fix ace display
     if (playerCardsArr.includes(1) && playerBlackjack === false) {
         if (sumOfArray(playerCardsArr) < 10) {
             playerTotalElem.textContent = Number(playerTotalElem.textContent.slice(0, 1)) + 10
         } else if (sumOfArray(playerCardsArr) === 10){
             playerTotalElem.textContent = 20
-        } else if (sumOfArray(playerCardsArr) === 11){
-            playerTotalElem.textContent = 21
         }
     }
 
-    // player bust condition
     if (Number(playerTotalElem.textContent) > 21) {
         titleTextElem.textContent = `You Lose!`
         playerTotalElem.textContent = `BUST`
@@ -234,11 +224,9 @@ function handleStandClick () {
         return
     }
 
-    // shift dealer Cards
     dealerCard1.style.animationDelay = `0s`
     dealerCard1.classList.add(`dealerCard1Shift`)
 
-    // check dealer blackjack
     dealDealerCard()
     if (dealerCardsArr.includes(1)) {
         if (sumOfArray(dealerCardsArr) === 11) {
@@ -247,9 +235,8 @@ function handleStandClick () {
         }
     }
     
-    // check blackjacks (avoid tying when blackjack vs 21)
     if (playerBlackjack && dealerBlackjack) {
-        titleTextElem.textContent = `Tie!`
+        titleTextElem.textContent = `Push`
         playerTotalElem.textContent = `21 (Blackjack)`
         renderPlayerTie()
         toggleNewGameBtn()
@@ -267,7 +254,6 @@ function handleStandClick () {
         return
     }
 
-    // deal dealer cards until 17 or more
     while (sumOfArray(dealerCardsArr) < 17) {
         let dealerStandNums = [7, 8, 9, 10, 11]
         if (dealerCardsArr.includes(1)) {
@@ -279,7 +265,6 @@ function handleStandClick () {
         dealDealerCard()
     }
 
-    // check for dealer bust
     if (Number(dealerTotalElem.textContent) > 21) {
         titleTextElem.textContent = `You Win!`
         dealerTotalElem.textContent = `BUST`
@@ -288,12 +273,11 @@ function handleStandClick () {
         return
     }
 
-    // check win, tie or loss condition
     if (Number(playerTotalElem.textContent) > Number(dealerTotalElem.textContent)) {
         titleTextElem.textContent = `You Win!`
         renderPlayerWin()
     } else if (Number(playerTotalElem.textContent) === Number(dealerTotalElem.textContent)) {
-        titleTextElem.textContent = `Tie!`
+        titleTextElem.textContent = `Push`
         renderPlayerTie()
     } else {
         titleTextElem.textContent = `You Lose!`
@@ -360,7 +344,6 @@ function handleNewGameClick () {
     }
     dealerCardCounter = 0
 
-    // ensure there is bet before dealing
     dealBtn.disabled = true
 }
 
@@ -368,7 +351,6 @@ function handleNewGameClick () {
 function handlePlayClick () {
     jazzSound.play()
 
-    // fade out splash screen elements
     playBtn.disabled = true
     document.querySelector(`.card1Inner`).classList.add(`puff-out-center`)
     document.querySelector(`.card2Inner`).classList.add(`puff-out-center`)
@@ -378,7 +360,6 @@ function handlePlayClick () {
     playBtn.classList.add(`fade-out`)
     playBtn.style.animationDelay = `0.9s`
 
-    // fade in betting screen elements
     titleTextElem.classList.add(`tracking-in-expand`)
     titleTextElem.style.animationDelay = `2s`
     bet1Btn.classList.add(`slide-in-blurred-bottom`)
@@ -395,6 +376,8 @@ function handlePlayClick () {
     chipsContainer.style.animationDelay = `4.2s`
     bettingContainer.classList.add(`scale-in-center`)
     bettingContainer.style.animationDelay = `4.2s`
+    muteImg.style.opacity = `1`
+    unMuteImg.style.opacity = `1`
 
     dealBtn.classList.remove(`displayNone`)
     dealBtn.classList.add(`scale-in-center`)
@@ -416,15 +399,11 @@ function handleBetClick (event) {
 function randomCardIndex () {
     randomIndex = Math.floor(Math.random() * 52)
 
-    // check if dealt
     while (deck[randomIndex].dealt === true) {
         randomIndex = Math.floor(Math.random() * 52)
     }
-
-    // renders card to dealt
     deck[randomIndex].dealt = true
 
-    // saves randomIndex to outside variable for reference
     randomIndexNum = randomIndex
 
     return randomIndex
@@ -432,7 +411,6 @@ function randomCardIndex () {
 
 
 function playerCheckAce () {
-    // check for player ace
     if (playerCardsArr.includes(1) && playerBlackjack === false) {
         if (sumOfArray(playerCardsArr) + 10 <= 21) {
             playerTotalElem.textContent = playerTotalElem.textContent + ` / ${Number(playerTotalElem.textContent) + 10}`
@@ -444,7 +422,6 @@ function playerCheckAce () {
 
 
 function dealerCheckAce () {
-    // check for dealer ace
     if (dealerCardsArr.includes(1)) {
         if (sumOfArray(dealerCardsArr) + 10 <= 21) {
             dealerTotalElem.textContent = dealerTotalElem.textContent + ` / ${Number(dealerTotalElem.textContent) + 10}`
@@ -604,7 +581,6 @@ function togglePlayingBtns () {
 
 function toggleNewGameBtn () {
     if (newGameBtnActive === false) {
-        newGameBtn.classList.remove(`displayNone`)
         newGameBtn.classList.add(`scale-in-center`)
         newGameBtn.style.animationDelay = `1s`
         newGameBtnActive = true
@@ -659,11 +635,26 @@ function checkBankruptcy () {
 }
 
 
+function muteToggle () {
+    if (mute) {
+        muteImg.classList.remove(`hide`)
+        unMuteImg.classList.add(`hide`)
+        jazzSound.play()
+        mute = false
+    } else {
+        unMuteImg.classList.remove(`hide`)
+        muteImg.classList.add(`hide`)
+        jazzSound.pause()
+        jazzSound.currentTime = 0
+        mute = true
+    }
+}
+
+
 function preloadImg () {
     for (let i = 0; i < 52; i++) {
         allCardImg = new Image();
         allCardImg.src = `./images/cards/${i}.svg`
     }
 }
-
 preloadImg()

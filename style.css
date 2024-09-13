@@ -170,10 +170,6 @@ html, body {
     opacity: 0;
 }
 
-.newGame-Btn {
-    display: absolute;
-}
-
 .deal-Btn:hover, .hit-Btn:hover, .stand-Btn:hover, .double-Btn:hover, .newGame-Btn:hover {
     transform: scale(1.04);
     background-color: #1e55cc;
@@ -279,6 +275,21 @@ html, body {
 button.disabled {
     opacity: 50%;
     pointer-events: none;
+}
+
+.mute, .unmute {
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    width: 40px;
+    height: auto;
+    opacity: 0;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.hide {
+    display: none;
 }
 
 /* animation */
